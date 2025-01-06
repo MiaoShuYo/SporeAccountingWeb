@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import Login from '../components/login/Login.vue'
+import Register from '../components/login/Register.vue'
+import {type Component, ref} from 'vue'
+const currentComponent:Component = ref(Login)
+
+
+const toggleComponent = () => {
+  currentComponent.value = currentComponent.value !==Login ? Register : Login;
+}
+
 </script>
 
 <template>
@@ -9,7 +18,7 @@ import Login from '../components/login/Login.vue'
     </div>
     <div class="section">
       <div class="border">
-        <Login />
+        <component :is="currentComponent" @switch="toggleComponent" />
       </div>
     </div>
   </div>

@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import {ref} from "vue";
-
+import {ref,defineEmits} from "vue";
+const emit = defineEmits(['switch']);
 const loginData = ref({
   username: '',
   password: ''
 });
 const login = () => {
   console.log('Login');
+}
+const toRegister = () => {
+  emit('switch');
 }
 </script>
 
@@ -27,7 +30,7 @@ const login = () => {
       <el-form-item>
         <el-button type="primary" style="width: 100%;height:40px;line-height: 40px " @click="login">登录</el-button>
         <el-link :underline="false" style="text-align: left; width: 50%;display: block;margin-top: 10px;" type="primary" href="javascript:void(0)">忘记密码</el-link>
-        <el-link :underline="false" style="text-align: right; width: 50%;display: block;margin-top: 10px" type="primary" href="javascript:void(0)">注册</el-link>
+        <el-link :underline="false" style="text-align: right; width: 50%;display: block;margin-top: 10px" type="primary"  v-on:click="toRegister">注册</el-link>
       </el-form-item>
     </el-form>
   </div>
