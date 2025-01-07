@@ -50,6 +50,7 @@ const toggleComponent = () => {
   justify-content: center;
   align-items: center;
   flex: 1;
+  min-width: 451.5px;
 }
 .border {
   border: 1px solid #ccc;
@@ -65,5 +66,13 @@ const toggleComponent = () => {
   width: 100%;
   position: absolute;
   bottom: 0;
+}
+@media (max-width: 903px) {
+  .section {
+    min-width: 100%;
+  }
+  .image-section {
+    display: none;
+  }
 }
 </style>
