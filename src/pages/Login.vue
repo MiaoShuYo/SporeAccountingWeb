@@ -1,14 +1,23 @@
 <script setup lang="ts">
 import Login from '../components/login/Login.vue'
 import Register from '../components/login/Register.vue'
+import RetrievePassword from "../components/login/RetrievePassword.vue";
 import {computed, ref} from 'vue'
-const isComponentAVisible = ref(true)
+
+const componentAVisible = ref(0)
 
 
-const toggleComponent = () => {
-  isComponentAVisible.value=!isComponentAVisible.value
+const toggleComponent = (param: String) => {
+  if (param === "login")
+    componentAVisible.value = 0
+  else if (param === "register")
+    componentAVisible.value = 1
+  else
+    componentAVisible.value = 2
+
+
 }
-const currentComponent = computed(() => isComponentAVisible.value ? Login : Register)
+const currentComponent = computed(() => componentAVisible.value == 0 ? Login : componentAVisible.value == 1 ? Register : RetrievePassword)
 
 </script>
 
@@ -21,7 +30,7 @@ const currentComponent = computed(() => isComponentAVisible.value ? Login : Regi
     </div>
     <div class="section">
       <div class="border">
-        <component :is="currentComponent" @switch="toggleComponent" />
+        <component :is="currentComponent" @switch="toggleComponent"/>
       </div>
     </div>
   </div>
@@ -48,6 +57,7 @@ const currentComponent = computed(() => isComponentAVisible.value ? Login : Regi
   max-width: 100%;
   max-height: 100%;
 }
+
 .section {
   display: flex;
   justify-content: center;
@@ -55,6 +65,7 @@ const currentComponent = computed(() => isComponentAVisible.value ? Login : Regi
   flex: 1;
   min-width: 451.5px;
 }
+
 .border {
   border: 1px solid #ccc;
   padding: 20px;
@@ -63,6 +74,7 @@ const currentComponent = computed(() => isComponentAVisible.value ? Login : Regi
   min-height: 45%;
   height: auto;
 }
+
 .footer {
   text-align: center;
   padding-bottom: 35px;
@@ -70,10 +82,12 @@ const currentComponent = computed(() => isComponentAVisible.value ? Login : Regi
   position: absolute;
   bottom: 0;
 }
+
 @media (max-width: 903px) {
   .section {
     min-width: 100%;
   }
+
   .image-section {
     display: none;
   }
