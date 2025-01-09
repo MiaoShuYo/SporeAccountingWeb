@@ -1,20 +1,23 @@
 <script setup lang="ts">
 import Login from '../components/login/Login.vue'
 import Register from '../components/login/Register.vue'
-import {type Component, ref} from 'vue'
-const currentComponent:Component = ref(Login)
+import {computed, ref} from 'vue'
+const isComponentAVisible = ref(true)
 
 
 const toggleComponent = () => {
-  currentComponent.value = currentComponent.value !==Login ? Register : Login;
+  isComponentAVisible.value=!isComponentAVisible.value
 }
+const currentComponent = computed(() => isComponentAVisible.value ? Login : Register)
 
 </script>
 
 <template>
   <div class="container">
     <div class="image-section">
-      <img src="../assets/login.svg" class="image" alt="Login Image">
+      <img src="../assets/login.svg" v-if="currentComponent==Login" class="image" alt="Login Image">
+      <img src="../assets/register.svg" v-else-if="currentComponent==Register" class="image" alt="Register Image">
+      <img src="../assets/findPassword.svg" v-else class="image" alt="FindPassword Image">
     </div>
     <div class="section">
       <div class="border">
