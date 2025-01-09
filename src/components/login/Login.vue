@@ -1,18 +1,45 @@
 <script setup lang="ts">
-import {ref,defineEmits} from "vue";
+import {ref, defineEmits, inject, reactive} from "vue";
+import type {FormRules, FormInstance} from "element-plus";
+
 const emit = defineEmits(['switch']);
-const loginData = ref({
+const axios: any = inject('axios')
+
+interface LoginData {
+  username: string;
+  password: string;
+}
+
+const ruleLoginRef = ref<FormInstance>()
+const loginData = reactive<LoginData>({
   username: '',
   password: ''
-});
-const login = () => {
-  console.log('Login');
+})
+const rules = reactive<FormRules<LoginData>>({
+  username: [
+    {required: true, message: '用户名不能为空', trigger: 'blur'}
+  ],
+  password: [
+    {required: true, message: '密码不能为空', trigger: 'blur'},
+  ]
+})
+const login = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  formEl.validate().then(() => {
+    axios.get(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/Login/' + loginData.username + '/' + loginData.password).then((res: any) => {
+      console.log(res);
+    }).catch((err: any) => {
+      console.log(err);
+    });
+  }).catch(() => {
+    return
+  })
 }
 const toRegister = () => {
-  emit('switch',"register");
+  emit('switch', "register");
 }
-const toRetrievePassword=()=>{
-  emit('switch',"retrievePassword")
+const toRetrievePassword = () => {
+  emit('switch', "retrievePassword")
 }
 </script>
 
@@ -21,19 +48,27 @@ const toRetrievePassword=()=>{
     <div style="text-align: center">
       <img src="../../assets/logo.png" style="width:200px;height: 49px; max-height: 100%;" alt="Login Image">
     </div>
-    <el-form :model="loginData" label-position="top">
-      <el-form-item label="用户名" >
+    <el-form ref="ruleLoginRef"
+             :model="loginData"
+             :rules="rules" l
+             label-position="top"
+             status-icon>
+      <el-form-item label="用户名" prop="username">
         <el-input style="height:40px;line-height: 40px " v-model="loginData.username"
                   placeholder="请输入..."></el-input>
       </el-form-item>
-      <el-form-item label="密码">
+      <el-form-item label="密码" prop="password">
         <el-input style="height:40px;line-height: 40px " v-model="loginData.password" type="password"
                   placeholder="请输入..."></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" style="width: 100%;height:40px;line-height: 40px " @click="login">登录</el-button>
-        <el-link :underline="false" style="text-align: left; width: 50%;display: block;margin-top: 10px;" type="primary" v-on:click="toRetrievePassword">忘记密码</el-link>
-        <el-link :underline="false" style="text-align: right; width: 50%;display: block;margin-top: 10px" type="primary"  v-on:click="toRegister">注册</el-link>
+        <el-button type="primary" style="width: 100%;height:40px;line-height: 40px " @click="login(ruleLoginRef)">登录</el-button>
+        <el-link :underline="false" style="text-align: left; width: 50%;display: block;margin-top: 10px;" type="primary"
+                 v-on:click="toRetrievePassword">忘记密码
+        </el-link>
+        <el-link :underline="false" style="text-align: right; width: 50%;display: block;margin-top: 10px" type="primary"
+                 v-on:click="toRegister">注册
+        </el-link>
       </el-form-item>
     </el-form>
   </div>
@@ -43,7 +78,8 @@ const toRetrievePassword=()=>{
 .el-form-item {
   margin-bottom: 35px;
 }
-:deep(.el-form-item__label){
+
+:deep(.el-form-item__label) {
   font-size: 16px;
 }
 </style>
