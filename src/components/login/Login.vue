@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import {ref, defineEmits, inject, reactive} from "vue";
-import type {FormRules, FormInstance} from "element-plus";
+import {type FormRules, type FormInstance, ElMessage} from "element-plus";
+import type {Login,LoginResponse} from '../../Interface/login.ts'
+import type {Response} from "../../Interface/response.ts";
 
 const emit = defineEmits(['switch']);
 const axios: any = inject('axios')
 
-interface LoginData {
-  username: string;
-  password: string;
-}
 
 const ruleLoginRef = ref<FormInstance>()
-const loginData = reactive<LoginData>({
+const loginData = reactive<Login>({
   username: '',
   password: ''
 })
-const rules = reactive<FormRules<LoginData>>({
+const rules = reactive<FormRules<Login>>({
   username: [
     {required: true, message: '用户名不能为空', trigger: 'blur'}
   ],
@@ -27,7 +25,12 @@ const login = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
     axios.get(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/Login/' + loginData.username + '/' + loginData.password).then((res: any) => {
-      console.log(res);
+      const response: Response<LoginResponse> = res.data;
+      if (response.statusCode === 200) {
+        console.log(response.data);
+      } else {
+        ElMessage.error(response.errorMessage)
+      }
     }).catch((err: any) => {
       console.log(err);
     });

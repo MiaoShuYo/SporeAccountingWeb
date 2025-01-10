@@ -1,17 +1,11 @@
 <script setup lang="ts">
 import {ref, defineEmits, reactive, inject} from "vue";
-import type {FormInstance, FormRules} from "element-plus";
+import {ElMessage, type FormInstance, type FormRules} from "element-plus";
+import type {Register} from "../../Interface/login.ts";
+import type {Response} from "../../Interface/response.ts";
 
 const emit = defineEmits(['switch']);
 const axios: any = inject('axios')
-
-interface Register {
-  userName: string;
-  password: string;
-  rePassword: string;
-  phoneNumber: string;
-  email: string;
-}
 
 const ruleRegisterRef = ref<FormInstance>()
 const registerData = reactive<Register>({
@@ -53,7 +47,12 @@ const register = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
     axios.post(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/Register', registerData).then((res: any) => {
-      console.log(res);
+      const response: Response<boolean> = res.data;
+      if (response.statusCode === 200) {
+        emit('switch', "login");
+      } else {
+        ElMessage.error(response.errorMessage)
+      }
     }).catch((err: any) => {
       console.log(err);
     });
@@ -72,7 +71,7 @@ const toLogin = () => {
     </div>
     <el-form ref="ruleRegisterRef"
              :model="registerData"
-             :rules="rules" l
+             :rules="rules"
              label-position="top"
              status-icon>
       <el-form-item label="用户名" prop="userName">
