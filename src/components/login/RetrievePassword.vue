@@ -75,7 +75,7 @@ const toLogin = () => {
         <el-button type="primary" style="width: 100%;height:40px;line-height: 40px" @click="retrievePassword(ruleRetrievePasswordRef)">找回密码
         </el-button>
         <label>已有账号？</label>
-        <el-link :underline="false" type="primary" v-on:click="toLogin">去登录</el-link>
+        <el-link :underline="false" type="primary" v-on:click="toLogin">登录</el-link>
       </el-form-item>
     </el-form>
   </div>

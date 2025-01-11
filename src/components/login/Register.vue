@@ -99,7 +99,7 @@ const toLogin = () => {
           注册
         </el-button>
         <label>已有账号？</label>
-        <el-link :underline="false" type="primary" v-on:click="toLogin">去登录</el-link>
+        <el-link :underline="false" type="primary" v-on:click="toLogin">登录</el-link>
       </el-form-item>
     </el-form>
   </div>
