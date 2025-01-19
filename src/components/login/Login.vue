@@ -3,6 +3,7 @@ import {ref, defineEmits, inject, reactive} from "vue";
 import {type FormRules, type FormInstance, ElMessage} from "element-plus";
 import type {Login,LoginResponse} from '../../Interface/login.ts'
 import type {Response} from "../../Interface/response.ts";
+import {router} from "../../router";
 
 const emit = defineEmits(['switch']);
 const axios: any = inject('axios')
@@ -27,7 +28,9 @@ const login = (formEl: FormInstance | undefined) => {
     axios.get(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/Login/' + loginData.username + '/' + loginData.password).then((res: any) => {
       const response: Response<LoginResponse> = res.data;
       if (response.statusCode === 200) {
-        console.log(response.data);
+        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('refreshToken', response.data.refreshToken)
+        router.push({name: 'main'});
       } else {
         ElMessage.error(response.errorMessage)
       }
