@@ -3,7 +3,7 @@ import {ref, reactive, inject} from 'vue'
 import type {ResetPassword, SecuritySetting, PersonalInformation} from '../Interface/personalCenter.ts'
 import {type FormInstance, type FormRules, ElMessage} from "element-plus";
 import type {Response} from '../Interface/response.ts'
-import {router} from "../router";
+import {router, navigateTo} from "../router";
 
 const resetPasswordFormVisible = ref(false)
 const resetPasswordRef = ref<FormInstance>()
@@ -174,7 +174,7 @@ const logout = () => {
         <el-menu mode="horizontal" :ellipsis="false">
           <el-menu-item>
             <img
-                style="width: 100px"
+                style="width: 180px"
                 src="/src/assets/logo.png"
                 alt="Element logo"
             />
@@ -191,7 +191,49 @@ const logout = () => {
           </el-sub-menu>
         </el-menu>
       </el-header>
-      <el-main>Main</el-main>
+      <el-container>
+        <el-aside width="200px">
+          <el-menu
+              default-active="2"
+              id="mainMenu"
+          >
+            <el-menu-item index="1" @click="navigateTo('index')">
+              <el-icon>
+                <location/>
+              </el-icon>
+              <template #title>首页</template>
+            </el-menu-item>
+            <el-menu-item index="2">
+              <el-icon>
+                <Collection/>
+              </el-icon>
+              <template #title>账本</template>
+            </el-menu-item>
+            <el-menu-item index="3">
+              <el-icon>
+                <PieChart/>
+              </el-icon>
+              <template #title>报表</template>
+            </el-menu-item>
+            <el-sub-menu index="4">
+              <template #title>
+                <el-icon>
+                  <setting/>
+                </el-icon>
+                <span>配置</span>
+              </template>
+              <el-menu-item-group>
+                <el-menu-item index="4-1">收支分类</el-menu-item>
+                <el-menu-item index="4-2">预算设置</el-menu-item>
+                <el-menu-item index="4-3" @click="navigateTo('primaryCurrency')">主币种设置</el-menu-item>
+              </el-menu-item-group>
+            </el-sub-menu>
+          </el-menu>
+        </el-aside>
+        <el-main>
+          <router-view></router-view>
+        </el-main>
+      </el-container>
     </el-container>
   </div>
   <!--重置密码弹窗-->
@@ -301,5 +343,9 @@ const logout = () => {
 
 .el-main {
   padding-top: 10px;
+}
+
+#mainMenu {
+  height: 100%;
 }
 </style>
