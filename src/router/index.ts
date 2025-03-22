@@ -5,6 +5,7 @@ import Main from "../pages/Main.vue";
 import PrimaryCurrency from "../pages/config/PrimaryCurrency.vue";
 import notfound from "../pages/404.vue";
 import Index from "../pages/Index.vue";
+import IncomeExpenditureType from "../pages/config/IncomeExpenditureType.vue";
 
 const routes = [
     {
@@ -13,11 +14,18 @@ const routes = [
                 name: 'index', path: 'index', component: Index
             },
             {
-                name: 'config', path: '/config', children: [{
-                    name: 'primaryCurrency',
-                    path: 'primaryCurrency',
-                    component: PrimaryCurrency
-                }]
+                name: 'config', path: '/config', children: [
+                    {
+                        name: 'primaryCurrency',
+                        path: 'primaryCurrency',
+                        component: PrimaryCurrency
+                    },
+                    {
+                        name: 'incomeExpenditureType',
+                        path: 'incomeExpenditureType',
+                        component: IncomeExpenditureType
+                    }
+                ]
             },
         ]
     },

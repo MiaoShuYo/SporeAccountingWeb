@@ -4,7 +4,7 @@ import type {Config as PrimaryCurrency} from "../../Interface/config.ts";
 import type {Currency} from "../../Interface/currency.ts";
 import type {ExchangeRate} from "../../Interface/exchangeRate.ts";
 import type {PageResponse} from '../../Interface/response';
-import {ElMessage, type TableColumnCtx} from "element-plus";
+import {ElMessage} from "element-plus";
 import {dayjs} from "element-plus";
 
 const axios: any = inject('axios')
@@ -139,15 +139,15 @@ const formatDate = (row: any, column: any, cellValue: any, index: number) => {
 <template>
   <!--面包屑导航-->
   <el-breadcrumb separator="/">
-    <el-breadcrumb-item>首页</el-breadcrumb-item>
-    <el-breadcrumb-item>系统配置</el-breadcrumb-item>
-    <el-breadcrumb-item>主币种设置</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{path:'/'}">首页</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{path:'/config'}">系统配置</el-breadcrumb-item>
+    <el-breadcrumb-item><span style="font-weight: bold">主币种设置</span></el-breadcrumb-item>
   </el-breadcrumb>
   <div class="container">
     <div v-if="!isEdit">
       <!-- 一个文本区域 -->
       <el-text>当前主币种：{{ primaryCurrency.name }}</el-text>
-      <el-button type="primary" link style="padding-left: 10px" @click="edit">修改</el-button>
+      <el-button type="text" style="padding-left: 10px" @click="edit">修改</el-button>
     </div>
     <el-form v-if="isEdit">
       <el-form-item label="主币种：">
@@ -192,4 +192,5 @@ const formatDate = (row: any, column: any, cellValue: any, index: number) => {
 #save {
   margin-left: 10px;
 }
+
 </style>
