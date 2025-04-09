@@ -6,6 +6,7 @@ import PrimaryCurrency from "../pages/config/PrimaryCurrency.vue";
 import notfound from "../pages/404.vue";
 import Index from "../pages/Index.vue";
 import IncomeExpenditureType from "../pages/config/IncomeExpenditureType.vue";
+import Budget from "../pages/config/budget.vue";
 
 const routes = [
     {
@@ -24,6 +25,11 @@ const routes = [
                         name: 'incomeExpenditureType',
                         path: 'incomeExpenditureType',
                         component: IncomeExpenditureType
+                    },
+                    {
+                        name: 'budget',
+                        path: 'budget',
+                        component: Budget
                     }
                 ]
             },

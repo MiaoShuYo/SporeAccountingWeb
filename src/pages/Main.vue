@@ -224,7 +224,7 @@ const logout = () => {
               </template>
               <el-menu-item-group>
                 <el-menu-item index="4-1" @click="navigateTo('incomeExpenditureType')">收支分类</el-menu-item>
-                <el-menu-item index="4-2">预算设置</el-menu-item>
+                <el-menu-item index="4-2" @click="navigateTo('budget')">预算设置</el-menu-item>
                 <el-menu-item index="4-3" @click="navigateTo('primaryCurrency')">主币种设置</el-menu-item>
               </el-menu-item-group>
             </el-sub-menu>
