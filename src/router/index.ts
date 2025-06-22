@@ -7,12 +7,16 @@ import notfound from "../pages/404.vue";
 import Index from "../pages/Index.vue";
 import IncomeExpenditureType from "../pages/config/IncomeExpenditureType.vue";
 import Budget from "../pages/config/budget.vue";
+import AccountBook from "../pages/AccountBook.vue";
 
 const routes = [
     {
         name: 'main', path: '/', component: Main, children: [
             {
                 name: 'index', path: 'index', component: Index
+            },
+            {
+                name: 'accountBook', path: 'accountBook', component: AccountBook
             },
             {
                 name: 'config', path: '/config', children: [

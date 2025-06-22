@@ -249,7 +249,7 @@ onMounted(() => {
     <div class="account-book-list" v-loading="loading">
       <el-row :gutter="20">
         <el-col
-            v-for="(book, index) in accountBooks"
+            v-for="(book) in accountBooks"
             :key="book.id"
             :xs="24"
             :sm="12"

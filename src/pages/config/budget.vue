@@ -2,18 +2,13 @@
 import type {Budget, BudgetRequest} from "../../Interface/budget.ts";
 import {inject, onMounted, reactive, ref} from "vue";
 import {ElMessage, ElMessageBox, type FormInstance, type FormRules} from "element-plus";
-import type {PageResponse} from "../../Interface/response.ts";
 import type {IncomeExpenditureClassification} from "../../Interface/IncomeExpenditureClassification.ts";
 
 const axios: any = inject('axios')
 // 弹窗控制
 const dialogVisible = ref(false);
 // 表格
-const bugetPageResponse: PageResponse<Budget> = reactive({
-  data: [],
-  rowCount: 0,
-  pageCount: 0
-})
+const budgetResponse = reactive<Budget[]>([])
 
 const queryBudget = () => {
   axios.get(import.meta.env.VITE_API_BASE_URL + '/api/Budget/Query', {
@@ -24,10 +19,9 @@ const queryBudget = () => {
       .then((res: any) => {
         const response = res.data;
         if (response.statusCode === 200) {
+          budgetResponse.splice(0, budgetResponse.length);
           // 接收返回值
-          bugetPageResponse.pageCount = response.data.pageCount;
-          bugetPageResponse.rowCount = response.data.rowCount;
-          bugetPageResponse.data = response.data.data;
+          budgetResponse.push(...response.data);
         } else {
           ElMessage.error(response.errorMessage)
         }
@@ -47,6 +41,7 @@ const editBudget = (id: any) => {
   })
       .then((res: any) => {
         const response = res.data;
+        console.log(response);
         if (response.statusCode === 200) {
           // 接收返回值
           budgetRequest.id = response.data.id;
@@ -55,6 +50,7 @@ const editBudget = (id: any) => {
           budgetRequest.startTime = response.data.startTime;
           budgetRequest.endTime = response.data.endTime;
           budgetRequest.classificationId = response.data.classificationId;
+          budgetRequest.classificationName = response.data.classificationName;
           budgetRequest.remark = response.data.remark;
         } else {
           ElMessage.error(response.errorMessage)
@@ -92,6 +88,11 @@ const deleteBudget = (id: String) => {
 
 }
 
+// 格式化周期
+const formatPeriod = (row: any, column: any, cellValue: any, index: number) => {
+  return cellValue === 0 ? '年' : cellValue === 1 ? '月' : '季度';
+}
+
 // 新增/修改预算
 const budgetRequest = reactive<BudgetRequest>({
   id: '',
@@ -100,6 +101,7 @@ const budgetRequest = reactive<BudgetRequest>({
   startTime: '',
   endTime: '',
   classificationId: '',
+  classificationName: '',
   remark: ''
 });
 
@@ -143,7 +145,7 @@ const expenditureClassification = reactive<IncomeExpenditureClassification[]>([]
 
 // 获取支出分类
 const queryExpenditure = () => {
-  axios.get(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureClassification/QueryByType?type=0', {
+  axios.get(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureClassification/QueryByType/1', {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -152,7 +154,8 @@ const queryExpenditure = () => {
         const response = res.data;
         if (response.statusCode === 200) {
           // 接收返回值
-          expenditureClassification.push(response.data);
+          expenditureClassification.push(...response.data);
+          console.log(expenditureClassification);
         } else {
           ElMessage.error(response.errorMessage)
         }
@@ -165,7 +168,7 @@ const save = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
     if (budgetRequest.id === '') {
-      axios.post(import.meta.env.VITE_API_BASE_URL + '/api/Budget/Save', budgetRequest, {
+      axios.post(import.meta.env.VITE_API_BASE_URL + '/api/Budget/Add', budgetRequest, {
         headers: {
           Authorization: localStorage.getItem('token')
         }
@@ -223,12 +226,12 @@ onMounted(() => {
     <el-button type="primary" @click="addBudgetBtn">新增预算</el-button>
   </div>
   <div>
-    <el-table :data="bugetPageResponse.data" style="width: 100%">
+    <el-table :data="budgetResponse" style="width: 100%">
       <el-table-column type="index" width="100" label="编号"></el-table-column>
       <el-table-column prop="classificationName" label="预算分类"></el-table-column>
       <el-table-column prop="amount" label="预算金额"></el-table-column>
       <el-table-column prop="remaining" label="剩余金额"></el-table-column>
-      <el-table-column prop="period" label="预算周期"></el-table-column>
+      <el-table-column prop="period" label="预算周期" :formatter="formatPeriod"></el-table-column>
       <el-table-column prop="startTime" label="开始日期"></el-table-column>
       <el-table-column prop="endTime" label="结束日期"></el-table-column>
       <el-table-column label="操作">
@@ -248,7 +251,7 @@ onMounted(() => {
     <el-form :model="budgetRequest" :rules="rules" ref="budgetFormRef"
              label-width="80px">
       <el-form-item label="预算分类" prop="classificationId">
-        <el-select>
+        <el-select v-model="budgetRequest.classificationId" placeholder="请选择预算分类">
           <el-option
               v-for="item in expenditureClassification"
               :key="item.id"

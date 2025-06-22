@@ -18,5 +18,6 @@ export interface BudgetRequest{
     startTime: string,
     endTime: string,
     classificationId: string,
+    classificationName: string,
     remark: string
 }

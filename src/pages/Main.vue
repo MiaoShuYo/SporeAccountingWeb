@@ -203,7 +203,7 @@ const logout = () => {
               </el-icon>
               <template #title>首页</template>
             </el-menu-item>
-            <el-menu-item index="2">
+            <el-menu-item index="2" @click="navigateTo('accountBook')">
               <el-icon>
                 <Collection/>
               </el-icon>
