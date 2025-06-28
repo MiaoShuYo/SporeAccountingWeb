@@ -13,13 +13,13 @@ const routes = [
     {
         name: 'main', path: '/', component: Main, children: [
             {
-                name: 'index', path: 'index', component: Index
+                name: 'index', path: '', component: Index
             },
             {
                 name: 'accountBook', path: 'accountBook', component: AccountBook
             },
             {
-                name: 'config', path: '/config', children: [
+                name: 'config', path: 'config', children: [
                     {
                         name: 'primaryCurrency',
                         path: 'primaryCurrency',
@@ -42,6 +42,7 @@ const routes = [
     {name: 'login', path: '/login', component: Login},
     {name: 'notFound', path: '/:pathMatch(.*)*', component: notfound},
 ]
+
 // 判断路由是否在子路由中
 const isRouteInChildren = (routes: any[], routeName: string): boolean => {
     for (const route of routes) {
@@ -59,20 +60,32 @@ export const router = createRouter({
     history: createMemoryHistory(),
     routes,
 })
+
 export const navigateTo = (routeName: string) => {
     router.push({name: routeName});
 };
-router.beforeEach((to, _) => {
+
+router.beforeEach((to, from, next) => {
+    // 如果路由名称为空，重定向到主页面
+    if (!to.name) {
+        next({name: 'main'});
+        return;
+    }
+    
     // 不在父级路由以及子路由中跳转到404
     if (!isRouteInChildren(routes, to.name as string)) {
-        return {name: 'notFound'};
+        next({name: 'notFound'});
+        return;
     }
+    
     if (to.name !== 'login') {
         const token = localStorage.getItem('token')
         if (token) {
-            return true
+            next();
         } else {
-            return {name: 'login'}
+            next({name: 'login'});
         }
+    } else {
+        next();
     }
 })

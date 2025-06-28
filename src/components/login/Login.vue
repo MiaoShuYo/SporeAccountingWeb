@@ -30,7 +30,7 @@ const login = (formEl: FormInstance | undefined) => {
       if (response.statusCode === 200) {
         localStorage.setItem('token', response.data.token)
         localStorage.setItem('refreshToken', response.data.refreshToken)
-        router.push({name: 'main'});
+        router.push({name: 'index'});
       } else {
         ElMessage.error(response.errorMessage)
       }

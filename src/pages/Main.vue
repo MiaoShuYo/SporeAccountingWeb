@@ -1,9 +1,42 @@
 ﻿<script setup lang="ts">
-import {ref, reactive, inject} from 'vue'
+import {ref, reactive, inject, computed, watch} from 'vue'
+import {useRoute} from 'vue-router'
 import type {ResetPassword, SecuritySetting, PersonalInformation} from '../Interface/personalCenter.ts'
 import {type FormInstance, type FormRules, ElMessage} from "element-plus";
 import type {Response} from '../Interface/response.ts'
 import {router, navigateTo} from "../router";
+
+const route = useRoute()
+
+// 根据当前路由计算激活的菜单项
+const activeMenu = ref('1')
+
+// 监听路由变化，更新菜单高亮
+const updateActiveMenu = () => {
+  const routeName = route.name as string
+  switch (routeName) {
+    case 'index':
+      activeMenu.value = '1'
+      break
+    case 'accountBook':
+      activeMenu.value = '2'
+      break
+    case 'incomeExpenditureType':
+      activeMenu.value = '4-1'
+      break
+    case 'budget':
+      activeMenu.value = '4-2'
+      break
+    case 'primaryCurrency':
+      activeMenu.value = '4-3'
+      break
+    default:
+      activeMenu.value = '1'
+  }
+}
+
+// 监听路由变化
+watch(() => route.name, updateActiveMenu, { immediate: true })
 
 const resetPasswordFormVisible = ref(false)
 const resetPasswordRef = ref<FormInstance>()
@@ -194,7 +227,7 @@ const logout = () => {
       <el-container>
         <el-aside width="200px">
           <el-menu
-              default-active="2"
+              :default-active="activeMenu"
               id="mainMenu"
           >
             <el-menu-item index="1" @click="navigateTo('index')">
