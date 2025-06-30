@@ -8,6 +8,7 @@ import Index from "../pages/Index.vue";
 import IncomeExpenditureType from "../pages/config/IncomeExpenditureType.vue";
 import Budget from "../pages/config/budget.vue";
 import AccountBook from "../pages/AccountBook.vue";
+import Record from '../pages/Record.vue'
 
 const routes = [
     {
@@ -17,6 +18,11 @@ const routes = [
             },
             {
                 name: 'accountBook', path: 'accountBook', component: AccountBook
+            },
+            {
+                name: 'record',
+                path: 'record/:accountBookId',
+                component: Record
             },
             {
                 name: 'config', path: 'config', children: [

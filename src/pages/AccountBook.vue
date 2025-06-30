@@ -4,8 +4,10 @@ import type {AccountBook, CreateAccountBookRequest, UpdateAccountBookRequest} fr
 import type {Response} from '../Interface/response.ts'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {Plus, Edit, Delete, Setting} from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 
 const axios: any = inject('axios')
+const router = useRouter()
 
 // 账本列表
 const accountBooks = ref<AccountBook[]>([])
@@ -191,6 +193,11 @@ const closeEditDialog = () => {
   editFormRef.value?.resetFields()
 }
 
+// 跳转到记账页面
+const goToRecord = (accountBookId: string) => {
+  router.push({ name: 'record', params: { accountBookId } })
+}
+
 onMounted(() => {
   getAccountBooks()
 })
@@ -224,7 +231,7 @@ onMounted(() => {
             :xl="4"
             class="book-item-col"
         >
-          <div class="book-item">
+          <div class="book-item" @click="goToRecord(book.accountBookId)">
             <div class="book-header">
               <div class="book-icon">
                 <el-icon size="24">
@@ -239,7 +246,7 @@ onMounted(() => {
                 <span class="book-balance">{{ book.balance }}</span>
               </div>
             </div>
-            <div class="book-actions">
+            <div class="book-actions" @click.stop>
               <el-button
                   type="primary"
                   size="small"
