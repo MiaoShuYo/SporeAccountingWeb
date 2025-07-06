@@ -72,26 +72,29 @@ export const navigateTo = (routeName: string) => {
 };
 
 router.beforeEach((to, from, next) => {
-    // 如果路由名称为空，重定向到主页面
-    if (!to.name) {
-        next({name: 'main'});
+    // 如果是404页面，直接放行
+    if (to.name === 'notFound') {
+        next();
         return;
     }
     
-    // 不在父级路由以及子路由中跳转到404
-    if (!isRouteInChildren(routes, to.name as string)) {
+    // 如果是登录页面，直接放行
+    if (to.name === 'login') {
+        next();
+        return;
+    }
+    
+    // 如果路由名称为空或不在定义的路由中，跳转到404
+    if (!to.name || !isRouteInChildren(routes, to.name as string)) {
         next({name: 'notFound'});
         return;
     }
     
-    if (to.name !== 'login') {
-        const token = localStorage.getItem('token')
-        if (token) {
-            next();
-        } else {
-            next({name: 'login'});
-        }
-    } else {
+    // 检查token，如果没有token则跳转到登录页
+    const token = localStorage.getItem('token')
+    if (token) {
         next();
+    } else {
+        next({name: 'login'});
     }
 })
