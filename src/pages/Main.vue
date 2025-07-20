@@ -21,6 +21,9 @@ const updateActiveMenu = () => {
     case 'accountBook':
       activeMenu.value = '2'
       break
+    case 'report':
+      activeMenu.value = '3'
+      break
     case 'incomeExpenditureType':
       activeMenu.value = '4-1'
       break
@@ -242,7 +245,7 @@ const logout = () => {
               </el-icon>
               <template #title>账本</template>
             </el-menu-item>
-            <el-menu-item index="3">
+            <el-menu-item index="3" @click="navigateTo('report')">
               <el-icon>
                 <PieChart/>
               </el-icon>
