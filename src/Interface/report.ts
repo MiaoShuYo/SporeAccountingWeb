@@ -5,15 +5,15 @@ export enum ReportTypeEnum {
     /// <summary>
     /// 月度报表
     /// </summary>
-    Monthly = 1,
+    Monthly = 0,
     /// <summary>
     /// 季度报表
     /// </summary>
-    Quarterly = 2,
+    Quarterly = 1,
     /// <summary>
     /// 年度报表
     /// </summary>
-    Yearly = 3
+    Yearly = 2
 }
 
 /// <summary>
@@ -39,21 +39,17 @@ export interface ReportRequest {
 /// </summary>
 export interface ReportDataItem {
     /// <summary>
-    /// 时间标签（年月或年）
+    /// 年份
     /// </summary>
-    timeLabel: string;
+    year: number;
     /// <summary>
-    /// 支出金额
+    /// 月份
     /// </summary>
-    expenseAmount: number;
+    month: number;
     /// <summary>
-    /// 收入金额
+    /// 金额
     /// </summary>
-    incomeAmount: number;
-    /// <summary>
-    /// 净收入（收入-支出）
-    /// </summary>
-    netIncome: number;
+    amount: number;
 }
 
 /// <summary>
@@ -64,16 +60,4 @@ export interface ReportResponse {
     /// 报表数据列表
     /// </summary>
     data: ReportDataItem[];
-    /// <summary>
-    /// 总支出
-    /// </summary>
-    totalExpense: number;
-    /// <summary>
-    /// 总收入
-    /// </summary>
-    totalIncome: number;
-    /// <summary>
-    /// 总净收入
-    /// </summary>
-    totalNetIncome: number;
 } 

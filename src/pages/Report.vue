@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, inject, onMounted, computed, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Search, Refresh } from '@element-plus/icons-vue'
 import type { Response } from '../Interface/response'
 import type { ReportRequest, ReportResponse } from '../Interface/report'
 import { ReportTypeEnum } from '../Interface/report'
@@ -23,10 +24,7 @@ const reportParams = reactive<ReportRequest>({
 
 // 报表数据
 const reportData = ref<ReportResponse>({
-  data: [],
-  totalExpense: 0,
-  totalIncome: 0,
-  totalNetIncome: 0
+  data: []
 })
 
 // 计算属性：报表类型选项
@@ -55,6 +53,31 @@ const monthOptions = computed(() => {
   return months
 })
 
+// 格式化金额
+const formatAmount = (amount: number) => {
+  return '¥' + amount.toLocaleString('zh-CN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
+}
+
+// 计算属性：格式化后的数据
+const formattedData = computed(() => {
+  return reportData.value.data.map((item, index) => ({
+    ...item,
+    timeLabel: getTimeLabel(item.year, item.month, index),
+    formattedAmount: formatAmount(item.amount)
+  }))
+})
+
+// 获取时间标签
+const getTimeLabel = (year: number, month: number, index: number) => {
+  if (month === 0) {
+    return `${year}年第${index + 1}季度`
+  }
+  return `${year}年${month}月`
+}
+
 // 获取报表数据
 const getReportData = async () => {
   loading.value = true
@@ -72,6 +95,7 @@ const getReportData = async () => {
     const result: Response<ReportResponse> = response.data
     if (result.statusCode === 200) {
       reportData.value = result.data
+      console.log('报表数据:', reportData.value)
       renderChart()
     } else {
       ElMessage.error(result.errorMessage || '获取报表数据失败')
@@ -88,103 +112,76 @@ const getReportData = async () => {
 const renderChart = () => {
   if (!chartRef.value || !reportData.value.data.length) return
   
-  if (!chartInstance) {
-    chartInstance = echarts.init(chartRef.value)
-  }
-  
-  const chartData = reportData.value.data
-  const timeLabels = chartData.map(item => item.timeLabel)
-  const expenseData = chartData.map(item => item.expenseAmount)
-  const incomeData = chartData.map(item => item.incomeAmount)
-  const netIncomeData = chartData.map(item => item.netIncome)
-  
-  const option = {
-    title: {
-      text: getChartTitle(),
-      left: 'center',
-      textStyle: {
-        fontSize: 18,
-        fontWeight: 'bold'
-      }
-    },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow'
+  // 确保DOM元素已经准备好
+  setTimeout(() => {
+    if (!chartInstance) {
+      chartInstance = echarts.init(chartRef.value)
+    }
+    
+    const chartData = formattedData.value
+    const timeLabels = chartData.map(item => item.timeLabel)
+    const amountData = chartData.map(item => item.amount)
+    
+    console.log('图表数据:', { timeLabels, amountData })
+    
+    const option = {
+      title: {
+        text: getChartTitle(),
+        left: 'center',
+        textStyle: {
+          fontSize: 18,
+          fontWeight: 'bold'
+        }
       },
-      formatter: function(params: any) {
-        let result = `${params[0].name}<br/>`
-        params.forEach((param: any) => {
-          const color = param.color
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
+        formatter: function(params: any) {
+          const param = params[0]
           const value = param.value.toLocaleString('zh-CN', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
           })
-          result += `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${color};"></span>`
-          result += `${param.seriesName}: ¥${value}<br/>`
-        })
-        return result
-      }
-    },
-    legend: {
-      data: ['支出', '收入', '净收入'],
-      top: 30
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
-    },
-    xAxis: {
-      type: 'category',
-      data: timeLabels,
-      axisLabel: {
-        rotate: reportParams.reportType === ReportTypeEnum.Yearly ? 0 : 45
-      }
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: {
-        formatter: function(value: number) {
-          return '¥' + value.toLocaleString('zh-CN')
-        }
-      }
-    },
-    series: [
-      {
-        name: '支出',
-        type: 'bar',
-        data: expenseData,
-        itemStyle: {
-          color: '#ff6b6b'
+          return `${param.name}<br/>金额: ¥${value}`
         }
       },
-      {
-        name: '收入',
-        type: 'bar',
-        data: incomeData,
-        itemStyle: {
-          color: '#51cf66'
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: timeLabels,
+        axisLabel: {
+          rotate: reportParams.reportType === ReportTypeEnum.Yearly ? 0 : 45
         }
       },
-      {
-        name: '净收入',
-        type: 'line',
-        data: netIncomeData,
-        itemStyle: {
-          color: '#339af0'
-        },
-        lineStyle: {
-          width: 3
-        },
-        symbol: 'circle',
-        symbolSize: 8
-      }
-    ]
-  }
-  
-  chartInstance.setOption(option)
+      yAxis: {
+        type: 'value',
+        axisLabel: {
+          formatter: function(value: number) {
+            return '¥' + value.toLocaleString('zh-CN')
+          }
+        }
+      },
+      series: [
+        {
+          name: '金额',
+          type: 'bar',
+          data: amountData,
+          itemStyle: {
+            color: '#339af0'
+          }
+        }
+      ]
+    }
+    
+    chartInstance.setOption(option)
+  }, 100)
 }
 
 // 获取图表标题
@@ -221,14 +218,6 @@ const handleResize = () => {
   if (chartInstance) {
     chartInstance.resize()
   }
-}
-
-// 格式化金额
-const formatAmount = (amount: number) => {
-  return '¥' + amount.toLocaleString('zh-CN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })
 }
 
 // 组件挂载时初始化
@@ -303,53 +292,6 @@ onUnmounted(() => {
       </el-form>
     </el-card>
 
-    <!-- 统计概览 -->
-    <el-card class="stats-card" shadow="never">
-      <template #header>
-        <div class="card-header">
-          <span>统计概览</span>
-        </div>
-      </template>
-      
-      <el-row :gutter="20">
-        <el-col :span="8">
-          <div class="stat-item expense">
-            <div class="stat-icon">
-              <el-icon><Money /></el-icon>
-            </div>
-            <div class="stat-content">
-              <div class="stat-label">总支出</div>
-              <div class="stat-value">{{ formatAmount(reportData.totalExpense) }}</div>
-            </div>
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <div class="stat-item income">
-            <div class="stat-icon">
-              <el-icon><Wallet /></el-icon>
-            </div>
-            <div class="stat-content">
-              <div class="stat-label">总收入</div>
-              <div class="stat-value">{{ formatAmount(reportData.totalIncome) }}</div>
-            </div>
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <div class="stat-item net-income">
-            <div class="stat-icon">
-              <el-icon><TrendCharts /></el-icon>
-            </div>
-            <div class="stat-content">
-              <div class="stat-label">净收入</div>
-              <div class="stat-value" :class="{ 'negative': reportData.totalNetIncome < 0 }">
-                {{ formatAmount(reportData.totalNetIncome) }}
-              </div>
-            </div>
-          </div>
-        </el-col>
-      </el-row>
-    </el-card>
-
     <!-- 图表展示 -->
     <el-card class="chart-card" shadow="never">
       <template #header>
@@ -360,36 +302,6 @@ onUnmounted(() => {
       
       <div ref="chartRef" class="chart-container"></div>
     </el-card>
-
-    <!-- 数据表格 -->
-    <el-card class="table-card" shadow="never">
-      <template #header>
-        <div class="card-header">
-          <span>详细数据</span>
-        </div>
-      </template>
-      
-      <el-table :data="reportData.data" stripe style="width: 100%">
-        <el-table-column prop="timeLabel" label="时间" width="120" />
-        <el-table-column prop="expenseAmount" label="支出金额" width="150">
-          <template #default="scope">
-            <span class="expense-text">{{ formatAmount(scope.row.expenseAmount) }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="incomeAmount" label="收入金额" width="150">
-          <template #default="scope">
-            <span class="income-text">{{ formatAmount(scope.row.incomeAmount) }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="netIncome" label="净收入" width="150">
-          <template #default="scope">
-            <span :class="scope.row.netIncome >= 0 ? 'income-text' : 'expense-text'">
-              {{ formatAmount(scope.row.netIncome) }}
-            </span>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
   </div>
 </template>
 
@@ -399,9 +311,7 @@ onUnmounted(() => {
 }
 
 .query-card,
-.stats-card,
-.chart-card,
-.table-card {
+.chart-card {
   margin-bottom: 20px;
 }
 
@@ -416,59 +326,8 @@ onUnmounted(() => {
   width: 100%;
 }
 
-.stat-item {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.stat-item.expense {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-}
-
-.stat-item.income {
-  background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
-}
-
-.stat-item.net-income {
-  background: linear-gradient(135deg, #339af0 0%, #228be6 100%);
-}
-
-.stat-icon {
-  font-size: 2.5rem;
-  margin-right: 15px;
-  opacity: 0.8;
-}
-
-.stat-content {
-  flex: 1;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  margin-bottom: 5px;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.stat-value.negative {
-  color: #ff6b6b;
-}
-
-.expense-text {
-  color: #ff6b6b;
-  font-weight: 500;
-}
-
-.income-text {
-  color: #51cf66;
+.amount-text {
+  color: #339af0;
   font-weight: 500;
 }
 
