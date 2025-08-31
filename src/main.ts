@@ -7,6 +7,10 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
+// 全局基础地址兜底，避免环境变量未注入导致的 undefined
+const RAW_API_BASE = (import.meta as any).env?.VITE_API_BASE_URL as string | undefined
+axios.defaults.baseURL = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE;
+
 // 添加响应拦截器处理401状态码
 axios.interceptors.response.use(
   (response) => {

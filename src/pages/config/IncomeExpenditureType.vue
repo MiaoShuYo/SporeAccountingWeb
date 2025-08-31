@@ -8,6 +8,8 @@ import type {
 import type {PageResponse} from "../../Interface/response.ts";
 
 const axios: any = inject('axios')
+const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+const API_BASE = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE
 
 // 顶部搜索功能
 // 查询收支分类参数IncomeExpenditureClassificationPage
@@ -25,7 +27,7 @@ const incomeExpenditureClassificationParentOptions = reactive<IncomeExpenditureC
 
 // 查询父级类型
 const queryIncomeExpenditureType = () => {
-  axios.get(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureClassification/QueryParent', {
+  axios.get(API_BASE + '/IncomeExpenditureClassification/QueryParent', {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -82,7 +84,7 @@ const incomeExpenditureClassificationFormRef = ref<FormInstance>()
 const queryIncomeExpenditure = () => {
   incomeExpenditureClassificationPage.value.pageNumber = currentPage.value;
   incomeExpenditureClassificationPage.value.pageSize = pageSize.value;
-  axios.post(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureClassification/Query',
+  axios.post(API_BASE + '/IncomeExpenditureClassification/Query',
       incomeExpenditureClassificationPage.value, {
         headers: {
           Authorization: localStorage.getItem('token')
@@ -119,7 +121,7 @@ const deleteIncomeExpenditureClassification = (id: string) => {
     type: 'warning'
   }).then(() => {
     // 确认删除
-    axios.delete(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureClassification/Delete/' + id, {
+    axios.delete(API_BASE + '/IncomeExpenditureClassification/Delete/' + id, {
       headers: {
         Authorization: localStorage.getItem('token')
       }
@@ -166,7 +168,7 @@ const saveIncomeExpenditureClassification = (formEl: FormInstance | undefined) =
   formEl.validate().then(() => {
     if (incomeExpenditureClassification.id) {
       // 修改
-      axios.put(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureClassification/Update',
+      axios.put(API_BASE + '/IncomeExpenditureClassification/Update',
           incomeExpenditureClassification, {
             headers: {
               Authorization: localStorage.getItem('token')
@@ -185,7 +187,7 @@ const saveIncomeExpenditureClassification = (formEl: FormInstance | undefined) =
       });
     } else {
       // 新增
-      axios.post(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureClassification/Add',
+      axios.post(API_BASE + '/IncomeExpenditureClassification/Add',
           incomeExpenditureClassification, {
             headers: {
               Authorization: localStorage.getItem('token')
@@ -219,7 +221,7 @@ const rules = reactive<FormRules<IncomeExpenditureClassificationRequest>>({
 })
 
 // 格式化收支分类
-const formatType = (row: any, column: any, cellValue: any, index: number) => {
+const formatType = (_row: any, _column: any, cellValue: any, _index: number) => {
   return cellValue === 0 ? '收入' : cellValue === 1 ? '支出' : '其他';
 }
 

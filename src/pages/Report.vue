@@ -9,6 +9,8 @@ import * as echarts from 'echarts'
 
 // 注入axios
 const axios: any = inject('axios')
+const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+const API_BASE = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE
 
 // 响应式数据
 const loading = ref(false)
@@ -83,7 +85,7 @@ const getReportData = async () => {
   loading.value = true
   try {
     const response = await axios.post(
-      import.meta.env.VITE_API_BASE_URL + '/api/Report/GetReport',
+      API_BASE + '/Report/GetReport',
       reportParams,
       {
         headers: {

@@ -5,13 +5,15 @@ import {ElMessage, ElMessageBox, type FormInstance, type FormRules} from "elemen
 import type {IncomeExpenditureClassification} from "../../Interface/IncomeExpenditureClassification.ts";
 
 const axios: any = inject('axios')
+const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+const API_BASE = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE
 // 弹窗控制
 const dialogVisible = ref(false);
 // 表格
 const budgetResponse = reactive<Budget[]>([])
 
 const queryBudget = () => {
-  axios.get(import.meta.env.VITE_API_BASE_URL + '/api/Budget/Query', {
+  axios.get(API_BASE + '/Budget/Query', {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -34,7 +36,7 @@ const editBudget = (id: any) => {
   queryExpenditure();
   dialogVisible.value = true;
   // 查询预算
-  axios.get(import.meta.env.VITE_API_BASE_URL + '/api/Budget/QueryById/' + id, {
+  axios.get(API_BASE + '/Budget/QueryById/' + id, {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -68,7 +70,7 @@ const deleteBudget = (id: String) => {
     type: 'warning'
   }).then(() => {
     // 删除预算
-    axios.delete(import.meta.env.VITE_API_BASE_URL + '/api/Budget/Delete/' + id, {
+    axios.delete(API_BASE + '/Budget/Delete/' + id, {
       headers: {
         Authorization: localStorage.getItem('token')
       }
@@ -89,7 +91,7 @@ const deleteBudget = (id: String) => {
 }
 
 // 格式化周期
-const formatPeriod = (row: any, column: any, cellValue: any, index: number) => {
+const formatPeriod = (_row: any, _column: any, cellValue: any, _index: number) => {
   return cellValue === 0 ? '年' : cellValue === 1 ? '月' : '季度';
 }
 
@@ -109,7 +111,7 @@ const budgetRequest = reactive<BudgetRequest>({
 const rules = reactive<FormRules<BudgetRequest>>({
   amount: [
     {
-      validator: (rule, value, callback) => {
+      validator: (_rule, value, callback) => {
         if (value <= 0) {
           callback(new Error('预算金额必须大于0'));
         } else {
@@ -145,7 +147,7 @@ const expenditureClassification = reactive<IncomeExpenditureClassification[]>([]
 
 // 获取支出分类
 const queryExpenditure = () => {
-  axios.get(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureClassification/QueryByType/1', {
+  axios.get(API_BASE + '/IncomeExpenditureClassification/QueryByType/1', {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -168,7 +170,7 @@ const save = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
     if (budgetRequest.id === '') {
-      axios.post(import.meta.env.VITE_API_BASE_URL + '/api/Budget/Add', budgetRequest, {
+      axios.post(API_BASE + '/Budget/Add', budgetRequest, {
         headers: {
           Authorization: localStorage.getItem('token')
         }
@@ -186,7 +188,7 @@ const save = (formEl: FormInstance | undefined) => {
         ElMessage.error(err.message);
       });
     } else {
-      axios.put(import.meta.env.VITE_API_BASE_URL + '/api/Budget/Update', budgetRequest, {
+      axios.put(API_BASE + '/Budget/Update', budgetRequest, {
         headers: {
           Authorization: localStorage.getItem('token')
         }

@@ -119,6 +119,8 @@ import type {Currency} from '../Interface/currency.ts'
 
 
 const axios: any = inject('axios')
+const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+const API_BASE = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE
 const route = useRoute()
 const accountBookId = ref<string>(route.params.accountBookId as string)
 
@@ -192,7 +194,7 @@ const rules = reactive<FormRules>({
 
 // 根据类型查询收支分类
 const queryIncomeExpenditureClassifications = (type: number) => {
-  axios.get(import.meta.env.VITE_API_BASE_URL + `/api/IncomeExpenditureClassification/QueryByType/${type}`, {
+  axios.get(API_BASE + `/IncomeExpenditureClassification/QueryByType/${type}`, {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -210,7 +212,7 @@ const queryIncomeExpenditureClassifications = (type: number) => {
 
 // 查询货币列表
 const queryCurrencies = () => {
-  axios.get(import.meta.env.VITE_API_BASE_URL + '/api/Currency/QueryAll', {
+  axios.get(API_BASE + '/Currency/QueryAll', {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -253,7 +255,7 @@ const queryRecords = () => {
     queryParams.endDate = recordPage.value.endDate + 'T23:59:59.999Z'
   }
 
-  axios.post(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureRecord/Query', queryParams, {
+  axios.post(API_BASE + '/IncomeExpenditureRecord/Query', queryParams, {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -290,7 +292,7 @@ const deleteRecord = (id: string) => {
     type: 'warning'
   }).then(() => {
     // 确认删除
-    axios.delete(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureRecord/Delete/' + id, {
+    axios.delete(API_BASE + '/IncomeExpenditureRecord/Delete/' + id, {
       headers: {
         Authorization: localStorage.getItem('token')
       }
@@ -370,7 +372,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
         currencyId: requestData.currencyId,
         remark: requestData.remark
       }
-      axios.put(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureRecord/Update', updateData, {
+      axios.put(API_BASE + '/IncomeExpenditureRecord/Update', updateData, {
         headers: {
           Authorization: localStorage.getItem('token')
         }
@@ -388,7 +390,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
       })
     } else {
       // 新增
-      axios.post(import.meta.env.VITE_API_BASE_URL + '/api/IncomeExpenditureRecord/Add', requestData, {
+      axios.post(API_BASE + '/IncomeExpenditureRecord/Add', requestData, {
         headers: {
           Authorization: localStorage.getItem('token')
         }

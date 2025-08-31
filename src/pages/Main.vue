@@ -1,5 +1,5 @@
 ﻿<script setup lang="ts">
-import {ref, reactive, inject, computed, watch} from 'vue'
+import {ref, reactive, inject, watch} from 'vue'
 import {useRoute} from 'vue-router'
 import type {ResetPassword, SecuritySetting, PersonalInformation} from '../Interface/personalCenter.ts'
 import {type FormInstance, type FormRules, ElMessage} from "element-plus";
@@ -7,6 +7,8 @@ import type {Response} from '../Interface/response.ts'
 import {router, navigateTo} from "../router";
 
 const route = useRoute()
+const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+const API_BASE = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE
 
 // 根据当前路由计算激活的菜单项
 const activeMenu = ref('1')
@@ -104,7 +106,7 @@ const axios: any = inject('axios')
 const resetPassword = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
-    axios.put(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/ResetPassword',
+    axios.put(API_BASE + '/SysUser/ResetPassword',
         resetPasswordData, {
           headers: {
             'Authorization': localStorage.getItem('token')
@@ -131,7 +133,7 @@ const resetPassword = (formEl: FormInstance | undefined) => {
 const securitySetting = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
-    axios.put(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/EditUserSecurity',
+    axios.put(API_BASE + '/SysUser/EditUserSecurity',
         securitySettingData, {
           headers: {
             'Authorization': localStorage.getItem('token')
@@ -155,7 +157,7 @@ const securitySetting = (formEl: FormInstance | undefined) => {
 const personalInformation = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
-    axios.put(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/EditUserName',
+    axios.put(API_BASE + '/SysUser/EditUserName',
         personalInformationData, {
           headers: {
             'Authorization': localStorage.getItem('token')
@@ -177,7 +179,7 @@ const personalInformation = (formEl: FormInstance | undefined) => {
 }
 /*注销账户*/
 const deleteUser = () => {
-  axios.delete(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/LogoutUser', {
+  axios.delete(API_BASE + '/SysUser/LogoutUser', {
     headers: {
       'Authorization': localStorage.getItem('token')
     }

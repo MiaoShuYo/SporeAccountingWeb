@@ -7,6 +7,8 @@ import {router} from "../../router";
 
 const emit = defineEmits(['switch']);
 const axios: any = inject('axios')
+const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+const API_BASE = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE
 
 
 const ruleLoginRef = ref<FormInstance>()
@@ -25,7 +27,7 @@ const rules = reactive<FormRules<Login>>({
 const login = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
-    axios.get(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/Login/' + loginData.username + '/' + loginData.password).then((res: any) => {
+    axios.get(API_BASE + '/SysUser/Login/' + loginData.username + '/' + loginData.password).then((res: any) => {
       const response: Response<LoginResponse> = res.data;
       if (response.statusCode === 200) {
         localStorage.setItem('token', response.data.token)
@@ -35,7 +37,7 @@ const login = (formEl: FormInstance | undefined) => {
         ElMessage.error(response.errorMessage)
       }
     }).catch((err: any) => {
-      console.log(err);
+      console.error(err);
     });
   }).catch(() => {
     return

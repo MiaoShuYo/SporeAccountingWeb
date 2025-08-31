@@ -29,7 +29,9 @@ const rules = reactive<FormRules<RetrievePassword>>({
 const retrievePassword = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
-    axios.get(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/RetrievePassword/' + retrievePasswordForm.userName
+    const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+    const API_BASE = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE
+    axios.get(API_BASE + '/SysUser/RetrievePassword/' + retrievePasswordForm.userName
         + '/' + retrievePasswordForm.email + '/' + retrievePasswordForm.phoneNumber).then((res: any) => {
       const response: Response<String> = res.data;
       if (response.statusCode === 200) {

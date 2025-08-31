@@ -77,7 +77,7 @@ export const navigateTo = (routeName: string) => {
     router.push({name: routeName});
 };
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
     // 如果是404页面，直接放行
     if (to.name === 'notFound') {
         next();

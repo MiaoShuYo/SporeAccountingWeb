@@ -8,6 +8,8 @@ import {ElMessage} from "element-plus";
 import {dayjs} from "element-plus";
 
 const axios: any = inject('axios')
+const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+const API_BASE = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE
 const isEdit = ref(false)
 //定义接受返回值的PrimaryCurrency
 const primaryCurrency = reactive<PrimaryCurrency>({
@@ -34,7 +36,7 @@ onMounted(() => {
 
 // 页面加载出来后，获取主币种
 const queryPrimaryCurrency = () => {
-  axios.get(import.meta.env.VITE_API_BASE_URL + '/api/Config/QueryByConfigType/0', {
+  axios.get(API_BASE + '/Config/QueryByConfigType/0', {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -56,7 +58,7 @@ const queryPrimaryCurrency = () => {
 
 // 获取汇率
 const queryExchangeRate = () => {
-  axios.get(import.meta.env.VITE_API_BASE_URL + '/api/ExchangeRate/Query/' + currentPage.value + '/' + pageSize.value, {
+  axios.get(API_BASE + '/ExchangeRate/Query/' + currentPage.value + '/' + pageSize.value, {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -80,7 +82,7 @@ const queryExchangeRate = () => {
 const edit = () => {
   isEdit.value = true;
   //获取全部币种
-  axios.get(import.meta.env.VITE_API_BASE_URL + '/api/Currency/QueryAll', {
+  axios.get(API_BASE + '/Currency/QueryAll', {
     headers: {
       Authorization: localStorage.getItem('token')
     }
@@ -99,7 +101,7 @@ const edit = () => {
 }
 
 const save = () => {
-  axios.put(import.meta.env.VITE_API_BASE_URL + '/api/Config/Update', {
+  axios.put(API_BASE + '/Config/Update', {
     id: primaryCurrency.id,
     value: primaryCurrency.value,
     configTypeEnum: 0
@@ -131,7 +133,7 @@ const handleCurrentChange = (value: number) => {
   queryExchangeRate();
 }
 
-const formatDate = (row: any, column: any, cellValue: any, index: number) => {
+const formatDate = (_row: any, _column: any, cellValue: any, _index: number) => {
   return dayjs(cellValue).format('YYYY-MM-DD');
 };
 </script>

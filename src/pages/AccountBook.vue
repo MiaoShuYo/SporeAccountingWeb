@@ -7,6 +7,8 @@ import {Plus, Edit, Delete, Setting} from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 
 const axios: any = inject('axios')
+const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+const API_BASE = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE
 const router = useRouter()
 
 // 账本列表
@@ -47,7 +49,7 @@ const editFormRef = ref()
 const getAccountBooks = async () => {
   loading.value = true
   try {
-    const response = await axios.post(import.meta.env.VITE_API_BASE_URL + '/api/AccountBook/Query',
+    const response = await axios.post(API_BASE + '/AccountBook/Query',
         {
           data: {
             pageIndex: 1,
@@ -63,7 +65,7 @@ const getAccountBooks = async () => {
     const result: Response<AccountBook[]> = response.data
     console.log('获取账本列表响应:', result)
     if (result.statusCode === 200) {
-      accountBooks.value = result.data.data || []
+      accountBooks.value = result.data || []
     } else {
       ElMessage.error(result.errorMessage || '获取账本列表失败')
     }
@@ -81,7 +83,7 @@ const createAccountBook = async () => {
     // 表单验证
     await createFormRef.value.validate()
 
-    const response = await axios.post(import.meta.env.VITE_API_BASE_URL + '/api/AccountBook/Add',
+    const response = await axios.post(API_BASE + '/AccountBook/Add',
         createForm.value, {
           headers: {
             'Authorization': localStorage.getItem('token')
@@ -118,7 +120,7 @@ const deleteAccountBook = async (id: string, name: string) => {
       cancelButtonText: '取消',
       type: 'warning'
     })
-    const response = await axios.delete(import.meta.env.VITE_API_BASE_URL + `/api/AccountBook/Delete/${id}`, {
+    const response = await axios.delete(API_BASE + `/AccountBook/Delete/${id}`, {
       headers: {
         'Authorization': localStorage.getItem('token')
       }
@@ -162,7 +164,7 @@ const updateAccountBook = async () => {
     // 表单验证
     await editFormRef.value.validate()
 
-    const response = await axios.put(import.meta.env.VITE_API_BASE_URL + '/api/AccountBook/Update',
+    const response = await axios.put(API_BASE + '/AccountBook/Update',
         editForm.value, {
           headers: {
             'Authorization': localStorage.getItem('token')

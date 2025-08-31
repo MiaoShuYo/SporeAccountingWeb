@@ -6,6 +6,8 @@ import type {Response} from "../../Interface/response.ts";
 
 const emit = defineEmits(['switch']);
 const axios: any = inject('axios')
+const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)
+const API_BASE = (!RAW_API_BASE || RAW_API_BASE === 'undefined' || RAW_API_BASE === 'null') ? '/api' : RAW_API_BASE
 
 const ruleRegisterRef = ref<FormInstance>()
 const registerData = reactive<Register>({
@@ -25,7 +27,7 @@ const rules = reactive<FormRules<Register>>({
   rePassword: [
     {required: true, message: '确认密码不能为空', trigger: 'blur'},
     {
-      validator: (rule,value, callback) => {
+      validator: (_rule,value, callback) => {
         if (value !== registerData.password) {
           callback(new Error('两次输入密码不一致'));
         } else {
@@ -46,7 +48,7 @@ const rules = reactive<FormRules<Register>>({
 const register = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.validate().then(() => {
-    axios.post(import.meta.env.VITE_API_BASE_URL + '/api/SysUser/Register', registerData).then((res: any) => {
+    axios.post(API_BASE + '/SysUser/Register', registerData).then((res: any) => {
       const response: Response<boolean> = res.data;
       if (response.statusCode === 200) {
         emit('switch', "login");
